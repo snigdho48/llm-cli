@@ -1,4 +1,4 @@
-using LLM.CLI.Services;
+using LLM.CLI.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -21,16 +21,17 @@ internal static class Program
                 .UseSerilog()
                 .ConfigureServices(services =>
                 {
-                    services.AddSingleton<ApplicationInfoService>();
+			services.AddSingleton<CommandDispatcher>();
+
+			services.AddSingleton<ICommand, VersionCommand>();
+			services.AddSingleton<ICommand, HelpCommand>();
                 })
                 .Build();
 
-            var service = host.Services
-                .GetRequiredService<ApplicationInfoService>();
+            var dispatcher = host.Services
+                .GetRequiredService<CommandDispatcher>();
 
-            service.Print();
-
-            await host.RunAsync();
+            await dispatcher.ExecuteAsync(args);
         }
         catch (Exception ex)
         {
