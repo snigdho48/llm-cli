@@ -18,11 +18,165 @@ LLM CLI sets up **llama.cpp**, downloads models, picks your GPU (Intel / NVIDIA 
 
 ## Requirements
 
-- Windows 10/11 (64-bit)
-- About **16–32 GB RAM** for a 7B coding model (Q4)
-- Optional: Intel Graphics driver with Vulkan (for Iris Xe)
+- Windows 10/11
+- Self-contained Release **exe** / zip (no separate .NET install)
+- Optional: up-to-date GPU driver (Vulkan for Intel, NVIDIA Game Ready / Studio, AMD Adrenalin)
 
-No separate .NET install is required for the Release **exe** / zip builds (they are self-contained).
+Pick the download that matches your CPU:
+
+| Your PC | Download |
+|---------|----------|
+| Normal 64-bit Windows (most laptops) | `llm-*-win-x64.exe` or `…-win-x64.zip` |
+| 32-bit Windows | `llm-*-win-x86.exe` / zip |
+| Windows on ARM (Snapdragon / Copilot+ PC) | `llm-*-win-arm64.exe` / zip |
+
+---
+
+## Recommended settings by RAM
+
+Use these as a starting point. Prefer **Q4_K_M** GGUF files (good quality / size balance).  
+After changing settings: `llm serve --restart`.
+
+### Quick table
+
+| System RAM | Preferred model | Context | GPU layers | CPU threads | Notes |
+|------------|-----------------|---------|------------|-------------|-------|
+| **4 GB** | Tiny / avoid if possible | `2048` | `0` (CPU) | `2–4` | Barely usable; close other apps |
+| **8 GB** | `qwen2.5-coder-3b` | `4096` | `0–15` | `4` | Light coding only |
+| **16 GB** | `qwen2.5-coder-3b` or small 7B | `8192` | see GPU below | `4–6` | Comfortable for 3B; 7B is tight |
+| **32 GB** | **`qwen2.5-coder-7b`** ⭐ | `16384` | see GPU below | `6–8` | Best everyday coding setup |
+| **64 GB** | 7B–14B / DeepSeek Lite | `16384–32768` | see GPU below | `8–12` | Room for larger context & models |
+
+### 4 GB RAM
+
+| Setting | Value |
+|---------|-------|
+| Model | Smallest you can find (≤ ~2 GB GGUF). Not recommended for Cursor coding. |
+| Context | `2048` |
+| GPU layers | `0` |
+| Threads | `2`–`4` |
+| Profile | `cpu-only` |
+
+```powershell
+llm config set Runtime:Context 2048
+llm config set Runtime:GpuLayers 0
+llm config set Runtime:Threads 4
+llm profile use cpu-only
+```
+
+### 8 GB RAM
+
+| Setting | Value |
+|---------|-------|
+| Model | `qwen2.5-coder-3b` (~2 GB) |
+| Context | `4096` |
+| GPU layers | Integrated GPU: `10–15` · No GPU: `0` |
+| Threads | `4` |
+| Profile | `cpu-only` or `balanced` |
+
+```powershell
+llm model pull qwen2.5-coder-3b --use
+llm config set Runtime:Context 4096
+llm config set Runtime:GpuLayers 0
+llm config set Runtime:Threads 4
+```
+
+### 16 GB RAM
+
+| Setting | Value |
+|---------|-------|
+| Model | Prefer `qwen2.5-coder-3b` for speed, or `qwen2.5-coder-7b` if you close heavy apps |
+| Context | `8192` (use `4096` if the PC starts swapping) |
+| GPU layers | Intel iGPU: `20` · Discrete NVIDIA/AMD: `35–99` · CPU only: `0` |
+| Threads | `4`–`6` |
+| Profile | `balanced` |
+
+```powershell
+llm model pull qwen2.5-coder-3b --use
+llm config set Runtime:Context 8192
+llm config set Runtime:GpuLayers 20
+llm config set Runtime:Threads 6
+llm profile use balanced
+```
+
+### 32 GB RAM (recommended)
+
+| Setting | Value |
+|---------|-------|
+| Model | **`qwen2.5-coder-7b`** (Q4_K_M) — primary pick |
+| Alternatives | `qwen3-coder-8b`, `codellama-7b`, `mistral-7b` |
+| Context | `16384` |
+| GPU layers | Intel Iris Xe: **`29`** · Discrete GPU: **`99`** · CPU only: `0` |
+| Threads | `8` |
+| Profile | `iris-xe-coding` / `nvidia-cuda` / `amd-rocm` / `cpu-only` |
+
+```powershell
+llm model pull qwen2.5-coder-7b --use
+llm config set Runtime:Context 16384
+llm config set Runtime:GpuLayers 29
+llm config set Runtime:Threads 8
+llm profile use iris-xe-coding
+llm serve --restart
+```
+
+### 64 GB RAM
+
+| Setting | Value |
+|---------|-------|
+| Model | `qwen2.5-coder-7b` (fast) or larger (e.g. DeepSeek-Coder Lite / 14B Q4) |
+| Context | `16384`–`32768` |
+| GPU layers | Discrete: `99` · Intel iGPU: `29`–`35` · CPU: `0` |
+| Threads | `8`–`12` |
+| Profile | Vendor profile, then raise context |
+
+```powershell
+llm model pull qwen2.5-coder-7b --use
+llm config set Runtime:Context 32768
+llm config set Runtime:Threads 12
+llm serve --restart
+```
+
+---
+
+## Recommended settings by CPU cores
+
+`Runtime:Threads` should usually be **about half to ¾ of your logical cores**, not all of them (leave headroom for Windows + Cursor).
+
+| Logical cores (Task Manager) | Suggested `Runtime:Threads` |
+|------------------------------|-----------------------------|
+| 2–4 | `2`–`4` |
+| 6–8 | `4`–`6` |
+| 8–12 | `6`–`8` |
+| 12–16 | `8`–`12` |
+| 16+ | `12`–`16` |
+
+```powershell
+llm config set Runtime:Threads 8
+```
+
+On `llm init`, press **Enter** to keep the suggested thread count.
+
+---
+
+## Recommended settings by GPU
+
+| GPU | Backend | `GpuLayers` | Profile | Notes |
+|-----|---------|-------------|---------|-------|
+| **Intel Iris Xe / UHD** (laptop) | `vulkan` | `20`–`29` | `iris-xe-coding` | Shared memory with RAM; don’t set layers too high |
+| **Intel Arc** | `vulkan` | `35`–`99` | `iris-xe-coding` or custom | Stronger than Iris Xe |
+| **NVIDIA** (GTX/RTX) | `cuda` (or `vulkan`) | `99` | `nvidia-cuda` | Best speed when CUDA build is present |
+| **AMD** (Radeon) | `rocm` or `vulkan` | `99` | `amd-rocm` | Prefer ROCm if available, else Vulkan |
+| **No usable GPU / unstable** | `cpu` | `0` | `cpu-only` | Slowest but most reliable |
+
+```powershell
+llm gpu list
+llm gpu use 0 --backend vulkan --apply-profile   # Intel example
+llm gpu use 0 --backend cuda --apply-profile     # NVIDIA example
+llm gpu auto
+llm gpu doctor                                   # Intel Vulkan / oneAPI check
+```
+
+**Rule of thumb:** more VRAM / discrete GPU → higher `GpuLayers` (often `99`). Integrated Intel → stay around `20–29`.
 
 ---
 
@@ -30,171 +184,89 @@ No separate .NET install is required for the Release **exe** / zip builds (they 
 
 ### Option A — Single EXE (easiest)
 
-1. Download the EXE that matches your PC from [Releases](https://github.com/snigdho48/llm-cli/releases):
-
-| Your PC | File |
-|---------|------|
-| Normal 64-bit Windows (most laptops) | `llm-*-win-x64.exe` |
-| 32-bit Windows | `llm-*-win-x86.exe` |
-| Windows on ARM (Snapdragon / Copilot+ PC) | `llm-*-win-arm64.exe` |
-
-2. Rename it to `llm.exe` and put it in a folder on your PATH:
+1. Download the matching EXE from [Releases](https://github.com/snigdho48/llm-cli/releases)
+2. Rename to `llm.exe` and put it on your PATH:
 
 ```powershell
 mkdir $env:LOCALAPPDATA\LLM\bin -Force
 Copy-Item .\llm-*-win-x64.exe $env:LOCALAPPDATA\LLM\bin\llm.exe
-# Add that folder to your user PATH if needed, then open a new terminal:
 llm version
 ```
 
 ### Option B — Zip + installer
 
-1. Download the matching **`llm-cli-*-win-x64.zip`** (or `win-x86` / `win-arm64`) from [Releases](https://github.com/snigdho48/llm-cli/releases)
-2. Extract, then:
-
 ```powershell
 .\install.ps1
 ```
 
-3. Open a **new** terminal:
+Open a **new** terminal, then run `llm help`.
 
-```powershell
-llm version
-llm help
-```
-
-### Option C — From this repo (developers)
+### Option C — From this repo
 
 ```powershell
 .\scripts\install.ps1
 ```
 
-To uninstall the global `llm` shim later:
-
-```powershell
-.\scripts\uninstall.ps1
-```
+Uninstall shim: `.\scripts\uninstall.ps1`
 
 ---
 
 ## First-time setup (5 minutes)
 
-Pick a folder for AI files (models, runtime, logs), for example `D:\AI`.
+Pick a workspace folder (example: `D:\AI`).
 
-### Guided setup (easiest)
+### Guided
 
 ```powershell
 llm setup --workspace "D:\AI" --install-runtime
 ```
 
-This will:
-
-1. Create the workspace folders  
-2. Ask which **GPU or CPU** to use (or auto-pick)  
-3. Download a Windows **Vulkan** llama.cpp build if you don’t have one  
-4. Optionally register a model path when prompted  
-
-If you already have a `.gguf` model:
-
-```powershell
-llm setup --workspace "D:\AI" --install-runtime --model "D:\MODEL\your-model.gguf" --no-start
-```
-
 ### Step by step
 
 ```powershell
-# 1) Create workspace + choose GPU/CPU + set context / layers / port
-llm init "D:\AI"
-
-# 2) Get llama.cpp (auto-download) OR import your own build
-llm runtime install
-# llm runtime import "C:\path\to\llama.cpp\build"
-
-# 3) Get a model
-llm model search coder
-llm model pull qwen2.5-coder-7b --use
-# or use a file you already have:
-# llm model add "D:\MODEL\qwen2.5-coder-7b-instruct-q4_k_m.gguf" --use
-
-# 4) Start the server
+llm init "D:\AI"                  # GPU/CPU + context / layers / threads / port
+llm runtime install               # or: llm runtime import "C:\path\to\build"
+llm model pull qwen2.5-coder-7b --use   # pick model for your RAM (table above)
 llm serve
-
-# 5) Test it
 llm chat "Say hello in one sentence"
 llm doctor
 ```
 
-On `init`, press **Enter** on any question to keep the recommended default  
-(context length, GPU layers, threads, port, etc.).
+On `init`, press **Enter** to keep each recommended default.
 
 ---
 
 ## Everyday use
 
-### Start / stop the AI server
+### Server
 
-| What you want | Command |
-|---------------|---------|
-| Start server + show API URL | `llm serve` |
-| Restart after changing settings | `llm serve --restart` |
-| Start at Windows logon | `llm serve --daemon` |
-| Don’t auto-download runtime | `llm serve --no-install` |
-| Status | `llm runtime status` |
-| Stop | `llm runtime stop` |
-| Recent logs | `llm logs` |
+| Goal | Command |
+|------|---------|
+| Start + show API URL | `llm serve` |
+| Restart after config change | `llm serve --restart` |
+| Auto-start at logon | `llm serve --daemon` |
+| Status / stop / logs | `llm runtime status` · `llm runtime stop` · `llm logs` |
 
-When `serve` succeeds you’ll see something like:
+Example output:
 
 ```text
 OpenAI API : http://127.0.0.1:11434/v1
 API Key    : local-ai
 ```
 
-### Chat
+### Chat & models
 
 ```powershell
 llm chat "Explain recursion simply"
-llm chat          # interactive mode
+llm model search coder
+llm model pull qwen2.5-coder-7b --use
+llm model list
 ```
 
-### Models
-
-| Command | Meaning |
-|---------|---------|
-| `llm model search coder` | Browse suggested models |
-| `llm model search qwen --live` | Search Hugging Face |
-| `llm model pull qwen2.5-coder-7b --use` | Download and activate |
-| `llm model list` | Models you already registered |
-| `llm model use <id>` | Switch active model |
-| `llm model add "D:\path\file.gguf"` | Register a local file |
-
-After changing the model, restart:
-
-```powershell
-llm serve --restart
-```
-
-### GPU / CPU
-
-| Command | Meaning |
-|---------|---------|
-| `llm gpu list` | Show GPUs and backends |
-| `llm gpu use 0 --backend vulkan --apply-profile` | Select GPU 0 + Vulkan |
-| `llm gpu auto` | Auto-pick GPU + profile |
-| `llm gpu doctor` | Intel: check Vulkan / oneAPI |
-| `llm gpu fix --vulkan` | Try to install Vulkan Runtime via winget |
-
-### Settings (context, layers, port, …)
-
-View:
+### Change settings later
 
 ```powershell
 llm config show
-```
-
-Change (then restart the server):
-
-```powershell
 llm config set Runtime:Context 16384
 llm config set Runtime:GpuLayers 29
 llm config set Runtime:Threads 8
@@ -202,30 +274,23 @@ llm config set Runtime:Port 11434
 llm serve --restart
 ```
 
-| Setting | What it does | Typical value |
-|---------|----------------|---------------|
-| `Runtime:Context` | How much text the model can “see” | `8192` or `16384` |
-| `Runtime:GpuLayers` | How much of the model runs on GPU | `29` (Iris Xe), `0` = CPU |
-| `Runtime:Threads` | CPU threads | `8` |
-| `Runtime:Port` | Local API port | `11434` (if 8080 is taken) |
-| `Runtime:GpuBackend` | `vulkan` / `cuda` / `rocm` / `cpu` | `vulkan` on Intel |
+| Key | Meaning |
+|-----|---------|
+| `Runtime:Context` | How much text the model can “see” |
+| `Runtime:GpuLayers` | How much runs on GPU (`0` = CPU only) |
+| `Runtime:Threads` | CPU threads |
+| `Runtime:Port` | Local API port |
+| `Runtime:GpuBackend` | `vulkan` / `cuda` / `rocm` / `cpu` |
 
-You can also switch a full preset:
-
-```powershell
-llm profile list
-llm profile use iris-xe-coding
-llm profile use cpu-only
-```
+Presets: `llm profile list` → `llm profile use iris-xe-coding`
 
 ---
 
 ## Use with Cursor
 
-1. Start the server: `llm serve`
-2. Show connection details: `llm cursor`  
-   Or write a settings snippet: `llm cursor --write`
-3. In Cursor, point the OpenAI-compatible base URL to:
+1. `llm serve`
+2. `llm cursor` or `llm cursor --write`
+3. In Cursor, set OpenAI-compatible base URL to:
 
 ```text
 http://127.0.0.1:11434/v1
@@ -233,34 +298,18 @@ http://127.0.0.1:11434/v1
 
 API key (default): `local-ai`
 
-If your port is different, use the URL printed by `llm serve`.
-
 ---
 
 ## Quick troubleshooting
 
 | Problem | Try this |
 |---------|----------|
-| `llm` not found | Open a **new** terminal after `install.ps1`, or check PATH |
-| Server won’t start | `llm doctor` then `llm logs` |
-| Port already in use | `llm config set Runtime:Port 11434` then `llm serve --restart` |
+| `llm` not found | New terminal after install; check PATH |
+| Won’t start | `llm doctor` · `llm logs` |
+| Port in use | `llm config set Runtime:Port 11434` → `llm serve --restart` |
 | Slow / no GPU | `llm gpu list` → `llm gpu use 0 --backend vulkan --apply-profile` |
+| Out of memory / thrashing | Smaller model, lower context, `GpuLayers 0` |
 | Intel Vulkan issues | `llm gpu doctor` → `llm gpu fix --vulkan` |
-| Wrong context / layers | `llm config show` → set values → `llm serve --restart` |
-| No model | `llm model pull qwen2.5-coder-7b --use` |
-
----
-
-## Recommended model (32 GB laptop)
-
-For coding on Intel Iris Xe–class machines:
-
-```powershell
-llm model pull qwen2.5-coder-7b --use
-llm serve --restart
-```
-
-More model notes: [docs/MODELS.md](docs/MODELS.md)
 
 ---
 
@@ -272,10 +321,10 @@ llm help
 
 | Guide | For |
 |-------|-----|
+| [Models](docs/MODELS.md) | Extra model notes |
 | [Commands](docs/COMMANDS.md) | Full command list |
-| [Configuration](docs/CONFIGURATION.md) | Config file location & keys |
-| [Release / install zip](docs/RELEASE.md) | How releases are built |
-| [Contributing](docs/CONTRIBUTING.md) | Developers building from source |
+| [Configuration](docs/CONFIGURATION.md) | Config file location |
+| [Contributing](docs/CONTRIBUTING.md) | Building from source |
 
 ---
 

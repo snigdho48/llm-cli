@@ -4,6 +4,18 @@ All notable changes to LLM CLI are documented here.
 
 ## [Unreleased]
 
+### Changed — 2026-07-21
+
+**Time:** 2026-07-21 17:20 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** README adds preferred model/context/threads/GPU-layer guidance for 4–64 GB RAM, CPU cores, and GPU types.
+
+**Files:**
+- `README.md` — hardware recommendation tables + setup examples
+
+**Impact:** Users can pick model and runtime settings from RAM/CPU/GPU without reading internal docs.
+
 ### Added — 2026-07-21
 
 **Time:** 2026-07-21 17:15 (UTC+6)  
