@@ -33,6 +33,7 @@ internal static class Program
 			services.AddSingleton<ICommand, HelpCommand>();
 			services.AddSingleton<ICommand, RuntimeCommand>();
 			services.AddSingleton<ICommand, DoctorCommand>();
+			services.AddSingleton<ICommand, ConfigCommand>();
                 })
                 .Build();
 
