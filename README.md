@@ -185,11 +185,15 @@ llm gpu doctor                                   # Intel Vulkan / oneAPI check
 ### Option A — Single EXE (easiest)
 
 1. Download the matching EXE from [Releases](https://github.com/snigdho48/llm-cli/releases)
-2. Rename to `llm.exe` and put it on your PATH:
+2. Run install (copies itself to `%LOCALAPPDATA%\LLM\bin` and adds PATH):
 
 ```powershell
-mkdir $env:LOCALAPPDATA\LLM\bin -Force
-Copy-Item .\llm-*-win-x64.exe $env:LOCALAPPDATA\LLM\bin\llm.exe
+.\llm-1.0.4-win-x64.exe install
+```
+
+Open a **new** terminal, then:
+
+```powershell
 llm version
 ```
 
@@ -199,7 +203,7 @@ llm version
 .\install.ps1
 ```
 
-Open a **new** terminal, then run `llm help`.
+Same result: `llm.exe` on PATH under `%LOCALAPPDATA%\LLM\bin`. Open a **new** terminal, then `llm help`.
 
 ### Option C — From this repo
 
@@ -207,7 +211,7 @@ Open a **new** terminal, then run `llm help`.
 .\scripts\install.ps1
 ```
 
-Uninstall shim: `.\scripts\uninstall.ps1`
+Uninstall: `.\scripts\uninstall.ps1` (add `-RemoveBinaries` to delete installed files).
 
 ---
 

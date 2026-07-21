@@ -9,6 +9,7 @@ public sealed class HelpCommand : ICommand
         Console.WriteLine("LLM CLI — Local AI coding workstation");
         Console.WriteLine();
         Console.WriteLine("Getting started:");
+        Console.WriteLine("  install                         Copy llm.exe to PATH (%LOCALAPPDATA%\\LLM\\bin)");
         Console.WriteLine("  setup                           First-time guided setup");
         Console.WriteLine("  serve [--restart] [--daemon] [--no-install]");
         Console.WriteLine("                                 Start server (auto-downloads runtime)");

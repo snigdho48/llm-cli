@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
 PackageIdentifier: Snigdho48.LLMCLI
-PackageVersion: 1.0.3
+PackageVersion: 1.0.4
 PackageLocale: en-US
 Publisher: Snigdho48
 PublisherUrl: https://github.com/snigdho48
@@ -24,6 +24,6 @@ Tags:
   - local-ai
   - openai
   - vulkan
-ReleaseNotesUrl: https://github.com/snigdho48/llm-cli/releases/tag/v1.0.3
+ReleaseNotesUrl: https://github.com/snigdho48/llm-cli/releases/tag/v1.0.4
 ManifestType: defaultLocale
 ManifestVersion: 1.9.0

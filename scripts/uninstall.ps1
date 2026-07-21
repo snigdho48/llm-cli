@@ -1,10 +1,11 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Removes the global LLM CLI shim from PATH.
+    Removes the global LLM CLI from PATH and optional binaries.
 
 .EXAMPLE
     .\scripts\uninstall.ps1
+    .\scripts\uninstall.ps1 -RemoveBinaries
 #>
 param(
     [switch]$RemoveBinaries
@@ -13,23 +14,26 @@ param(
 $ErrorActionPreference = "Stop"
 
 $installRoot = Join-Path $env:LOCALAPPDATA "LLM\cli"
-$shimDirectory = Join-Path $env:LOCALAPPDATA "LLM\bin"
-$shimPath = Join-Path $shimDirectory "llm.cmd"
+$binDirectory = Join-Path $env:LOCALAPPDATA "LLM\bin"
+$shimPath = Join-Path $binDirectory "llm.cmd"
+$binExe = Join-Path $binDirectory "llm.exe"
 
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if (-not [string]::IsNullOrWhiteSpace($userPath)) {
     $segments = $userPath -split ";" | Where-Object {
-        $_ -and ($_ -ne $shimDirectory)
+        $_ -and ($_ -ne $binDirectory)
     }
 
     $updatedPath = ($segments -join ";").Trim(";")
     [Environment]::SetEnvironmentVariable("Path", $updatedPath, "User")
-    Write-Host "Removed from user PATH: $shimDirectory" -ForegroundColor Green
+    Write-Host "Removed from user PATH: $binDirectory" -ForegroundColor Green
 }
 
-if (Test-Path $shimPath) {
-    Remove-Item $shimPath -Force
-    Write-Host "Removed shim: $shimPath" -ForegroundColor Green
+foreach ($path in @($shimPath, $binExe)) {
+    if (Test-Path $path) {
+        Remove-Item $path -Force
+        Write-Host "Removed: $path" -ForegroundColor Green
+    }
 }
 
 if ($RemoveBinaries -and (Test-Path $installRoot)) {

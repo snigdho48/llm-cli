@@ -9,7 +9,7 @@ on:
       version:
         description: "Version without v prefix (e.g. 1.0.2)"
         required: true
-        default: "1.0.3"
+        default: "1.0.4"
       prerelease:
         description: "Mark GitHub Release as prerelease"
         type: boolean
@@ -86,7 +86,13 @@ jobs:
 
             ### Install
 
-            **Single EXE:** download the matching `llm-*-win-*.exe`, rename to `llm.exe`, put on PATH.
+            **Single EXE:** download the matching `llm-*-win-*.exe`, then:
+
+            ```powershell
+            .\llm-${{ steps.ver.outputs.version }}-win-x64.exe install
+            ```
+
+            Open a new terminal and run `llm version`.
 
             **Zip:**
 

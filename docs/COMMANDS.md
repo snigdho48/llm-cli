@@ -67,6 +67,7 @@ Built-in: `iris-xe-coding`, `balanced`, `cpu-only`
 
 | Command | Description |
 |---------|-------------|
+| `llm install` | Copy this exe onto PATH (`%LOCALAPPDATA%\LLM\bin`) |
 | `llm chat [prompt] [--no-start]` | One-shot or interactive inference test |
 | `llm config show` | Print user configuration |
 | `llm config set <key> <value>` | Update configuration |
@@ -76,7 +77,7 @@ Built-in: `iris-xe-coding`, `balanced`, `cpu-only`
 ## Typical workflow
 
 ```powershell
-# Install globally
+# Install globally (or: .\llm-*-win-x64.exe install)
 .\scripts\install.ps1
 
 # First run

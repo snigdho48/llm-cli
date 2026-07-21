@@ -4,6 +4,34 @@ All notable changes to LLM CLI are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-07-21
+
+**Time:** 2026-07-21 17:22 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** v1.0.4 — `llm install` auto-installs to PATH; no manual mkdir/copy.
+
+**Files:**
+- `src/LLM.CLI/Commands/InstallCommand.cs`
+- `scripts/install.ps1` / `uninstall.ps1`
+- version bump 1.0.4
+
+**Impact:** `.\llm-*-win-x64.exe install` then `llm version` in a new terminal.
+
+### Added — 2026-07-21
+
+**Time:** 2026-07-21 17:20 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** `llm install` auto-copies the current exe to `%LOCALAPPDATA%\LLM\bin` and adds PATH; install.ps1 also places `llm.exe` there (accepts versioned release exes).
+
+**Files:**
+- `src/LLM.CLI/Commands/InstallCommand.cs` — new command (`install` / `--install`)
+- `scripts/install.ps1` / `uninstall.ps1` — bin placement + cleanup
+- `README.md`, release workflow notes — no more manual mkdir/copy
+
+**Impact:** Download exe → `.\llm-*-win-x64.exe install` → new terminal → `llm version`.
+
 ### Changed — 2026-07-21
 
 **Time:** 2026-07-21 17:14 (UTC+6)  

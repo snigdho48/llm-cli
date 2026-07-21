@@ -92,6 +92,8 @@ internal static class Program
 
                     services.AddSingleton<ICommand, HelpCommand>();
 
+                    services.AddSingleton<ICommand, InstallCommand>();
+
                     services.AddSingleton<ICommand, SetupCommand>();
 
                     services.AddSingleton<ICommand, InitCommand>();

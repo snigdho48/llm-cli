@@ -14,6 +14,10 @@ public sealed class CommandDispatcher
     public async Task<int> ExecuteAsync(string[] args)
     {
         var commandName = args.Length > 0 ? args[0] : "help";
+        if (commandName is "--install" or "-install")
+        {
+            commandName = "install";
+        }
 
         if (!_commands.TryGetValue(commandName, out var command))
         {
