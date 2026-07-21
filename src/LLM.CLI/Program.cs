@@ -1,4 +1,7 @@
 using LLM.CLI.Commands;
+using LLM.CLI.Configuration;
+using LLM.CLI.Configuration.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -19,8 +22,11 @@ internal static class Program
         {
             var host = Host.CreateDefaultBuilder(args)
                 .UseSerilog()
-                .ConfigureServices(services =>
-                {
+          	.ConfigureServices((context, services) =>
+                {    	services.Configure<LLMOptions>(
+        			context.Configuration.GetSection("LLM"));
+
+    			services.AddSingleton<ConfigurationService>();
 			services.AddSingleton<CommandDispatcher>();
 
 			services.AddSingleton<ICommand, VersionCommand>();
