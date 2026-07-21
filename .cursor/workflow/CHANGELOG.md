@@ -4,6 +4,18 @@ All notable changes to LLM CLI are documented here.
 
 ## [Unreleased]
 
+### Changed — 2026-07-21
+
+**Time:** 2026-07-21 17:05 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** README rewritten for end users (install, setup, everyday commands, Cursor, troubleshooting) instead of developer build details.
+
+**Files:**
+- `README.md` — user-facing guide
+
+**Impact:** New users can install from Releases and run `llm setup` / `llm serve` without reading internal docs.
+
 ### Added — 2026-07-21
 
 **Time:** 2026-07-21 17:00 (UTC+6)  
