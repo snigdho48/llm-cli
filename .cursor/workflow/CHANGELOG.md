@@ -6,6 +6,21 @@ All notable changes to LLM CLI are documented here.
 
 ### Added — 2026-07-21
 
+**Time:** 2026-07-21 17:15 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** Multi-arch Windows releases — self-contained `llm.exe` for win-x64, win-x86, and win-arm64.
+
+**Files:**
+- `scripts/release.ps1` — builds all RIDs; regenerates multi-arch winget installer
+- `scripts/install.ps1` — detects host arch (x64/x86/arm64) when building from source
+- `.github/workflows/release.yml` — uploads all exe/zip variants
+- `README.md` — arch download table
+
+**Impact:** Users on Intel/AMD x64, 32-bit x86, and Windows on ARM can download a matching binary.
+
+### Added — 2026-07-21
+
 **Time:** 2026-07-21 17:10 (UTC+6)  
 **Author:** Cursor agent
 

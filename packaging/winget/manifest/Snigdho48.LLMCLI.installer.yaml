@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.9.0.schema.json
-# InstallerSha256 is filled by scripts/release.ps1 after building the zip.
-# Self-contained single-file llm.exe ??? no .NET Runtime dependency.
+# InstallerSha256 values filled by scripts/release.ps1
+# Self-contained single-file llm.exe - no .NET Runtime dependency.
 PackageIdentifier: Snigdho48.LLMCLI
-PackageVersion: 1.0.1
+PackageVersion: 1.0.2
 Platform:
   - Windows.Desktop
 MinimumOSVersion: 10.0.17763.0
@@ -17,7 +17,13 @@ UpgradeBehavior: install
 ReleaseDate: 2026-07-21
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/snigdho48/llm-cli/releases/download/v1.0.1/llm-cli-1.0.1-win-x64.zip
-    InstallerSha256: 8268B186D7023D84A92D7211730ED1C4BD69A9A7A1D731B0776E1D53C80D4980
+    InstallerUrl: https://github.com/snigdho48/llm-cli/releases/download/v1.0.2/llm-cli-1.0.2-win-x64.zip
+    InstallerSha256: DF5E425DABB43D7933C71E07FA84F989D3187EB988BCB8A583F08EE6771D4B45
+  - Architecture: x86
+    InstallerUrl: https://github.com/snigdho48/llm-cli/releases/download/v1.0.2/llm-cli-1.0.2-win-x86.zip
+    InstallerSha256: 66E17D584788624D43731040EE099F5226B4B9D42AC773F750FC7C460141C427
+  - Architecture: arm64
+    InstallerUrl: https://github.com/snigdho48/llm-cli/releases/download/v1.0.2/llm-cli-1.0.2-win-arm64.zip
+    InstallerSha256: FB0047E1777EB8928EB1F4C71CB640134300687638481076D0568DE6BC890967
 ManifestType: installer
 ManifestVersion: 1.9.0

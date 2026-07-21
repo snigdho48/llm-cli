@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 <PropertyGroup>
 <OutputType>Exe</OutputType>
-<Version>1.0.1</Version>
-<AssemblyVersion>1.0.1.0</AssemblyVersion>
-<FileVersion>1.0.1.0</FileVersion>
+<Version>1.0.2</Version>
+<AssemblyVersion>1.0.2.0</AssemblyVersion>
+<FileVersion>1.0.2.0</FileVersion>
 <Product>LLM CLI</Product>
 <Description>Local AI runtime manager for Windows</Description>
 </PropertyGroup>

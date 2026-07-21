@@ -18,7 +18,7 @@ YAML lives in `manifest/` (keep README out of that folder — `winget validate` 
 .\scripts\release.ps1 -Version 1.0.0
 ```
 
-This publishes `artifacts/release/llm-cli-1.0.0-win-x64.zip`, writes `.sha256`, and updates `InstallerSha256` in the installer manifest.
+This publishes `artifacts/release/llm-cli-<ver>-win-{x64,x86,arm64}.zip`, matching `.exe` files, checksums, and updates InstallerSha256 for all architectures.
 
 ## Local validate / test
 

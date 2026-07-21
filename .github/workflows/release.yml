@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version without v prefix (e.g. 1.0.0)"
+        description: "Version without v prefix (e.g. 1.0.2)"
         required: true
-        default: "1.0.0"
+        default: "1.0.2"
       prerelease:
         description: "Mark GitHub Release as prerelease"
         type: boolean
@@ -43,7 +43,7 @@ jobs:
           else {
             $tag = "${{ github.ref_name }}"
             if ($tag -notmatch '^v?\d+\.\d+\.\d+') {
-              throw "Tag must look like v1.0.0 (got: $tag)"
+              throw "Tag must look like v1.0.2 (got: $tag)"
             }
             $version = $tag.TrimStart('v')
           }
@@ -51,34 +51,21 @@ jobs:
           "tag=v$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           Write-Host "Resolved version=$version tag=v$version"
 
-      - name: Build + package
+      - name: Build + package (x64, x86, arm64)
         shell: pwsh
         run: ./scripts/release.ps1 -Version "${{ steps.ver.outputs.version }}"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: llm-cli-${{ steps.ver.outputs.version }}-win-x64
+          name: llm-cli-${{ steps.ver.outputs.version }}-windows
           path: |
-            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip
-            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip.sha256
-            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x64.exe
-            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x64.exe.sha256
+            artifacts/release/llm-*.exe
+            artifacts/release/llm-*.exe.sha256
+            artifacts/release/llm-cli-*.zip
+            artifacts/release/llm-cli-*.zip.sha256
             packaging/winget/manifest/
           if-no-files-found: error
-
-      - name: Read SHA256
-        id: sha
-        shell: pwsh
-        run: |
-          $shaFile = "artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip.sha256"
-          $line = Get-Content $shaFile -Raw
-          $hash = ($line -split '\s+')[0].Trim()
-          "sha256=$hash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          $exeShaFile = "artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x64.exe.sha256"
-          $exeLine = Get-Content $exeShaFile -Raw
-          $exeHash = ($exeLine -split '\s+')[0].Trim()
-          "exe_sha256=$exeHash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -91,35 +78,43 @@ jobs:
           body: |
             ## LLM CLI ${{ steps.ver.outputs.tag }}
 
-            Self-contained Windows x64 build — **no separate .NET install required**.
+            Self-contained Windows builds — **no separate .NET install required**.
 
-            ### Quick install (single EXE)
+            | CPU | Download EXE | Download ZIP |
+            |-----|--------------|--------------|
+            | **64-bit (x64)** most PCs | `llm-${{ steps.ver.outputs.version }}-win-x64.exe` | `llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip` |
+            | **32-bit (x86)** | `llm-${{ steps.ver.outputs.version }}-win-x86.exe` | `llm-cli-${{ steps.ver.outputs.version }}-win-x86.zip` |
+            | **ARM64** (Snapdragon / Copilot+ PCs) | `llm-${{ steps.ver.outputs.version }}-win-arm64.exe` | `llm-cli-${{ steps.ver.outputs.version }}-win-arm64.zip` |
 
-            1. Download `llm-${{ steps.ver.outputs.version }}-win-x64.exe`
-            2. Rename to `llm.exe` (optional) and put it on your PATH, **or**
-            3. Download the zip and run `install.ps1`
+            ### Install
+
+            **Single EXE:** download the matching `llm-*-win-*.exe`, rename to `llm.exe`, put on PATH.
+
+            **Zip:**
 
             ```powershell
-            # Zip install
             Expand-Archive llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip -DestinationPath .\llm-cli
             cd .\llm-cli
             .\install.ps1
             llm --help
             ```
 
-            ### Checksums
-
-            - `llm-${{ steps.ver.outputs.version }}-win-x64.exe` — SHA256: `${{ steps.sha.outputs.exe_sha256 }}`
-            - `llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip` — SHA256: `${{ steps.sha.outputs.sha256 }}`
-
             ### Winget
 
-            Manifests for `Snigdho48.LLMCLI` are attached. Submit to winget-pkgs after this release is public.
+            Multi-arch manifests for `Snigdho48.LLMCLI` are attached.
           files: |
             artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x64.exe
             artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x64.exe.sha256
+            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x86.exe
+            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x86.exe.sha256
+            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-arm64.exe
+            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-arm64.exe.sha256
             artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip
             artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip.sha256
+            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x86.zip
+            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x86.zip.sha256
+            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-arm64.zip
+            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-arm64.zip.sha256
             packaging/winget/manifest/Snigdho48.LLMCLI.yaml
             packaging/winget/manifest/Snigdho48.LLMCLI.locale.en-US.yaml
             packaging/winget/manifest/Snigdho48.LLMCLI.installer.yaml

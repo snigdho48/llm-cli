@@ -30,21 +30,26 @@ No separate .NET install is required for the Release **exe** / zip builds (they 
 
 ### Option A — Single EXE (easiest)
 
-1. Download **`llm-*-win-x64.exe`** from [Releases](https://github.com/snigdho48/llm-cli/releases)
-2. Rename it to `llm.exe` and put it in a folder on your PATH  
-   (or run it by full path)
+1. Download the EXE that matches your PC from [Releases](https://github.com/snigdho48/llm-cli/releases):
+
+| Your PC | File |
+|---------|------|
+| Normal 64-bit Windows (most laptops) | `llm-*-win-x64.exe` |
+| 32-bit Windows | `llm-*-win-x86.exe` |
+| Windows on ARM (Snapdragon / Copilot+ PC) | `llm-*-win-arm64.exe` |
+
+2. Rename it to `llm.exe` and put it in a folder on your PATH:
 
 ```powershell
-# Example:
 mkdir $env:LOCALAPPDATA\LLM\bin -Force
-Copy-Item .\llm-1.0.1-win-x64.exe $env:LOCALAPPDATA\LLM\bin\llm.exe
+Copy-Item .\llm-*-win-x64.exe $env:LOCALAPPDATA\LLM\bin\llm.exe
 # Add that folder to your user PATH if needed, then open a new terminal:
 llm version
 ```
 
 ### Option B — Zip + installer
 
-1. Download **`llm-cli-*-win-x64.zip`** from [Releases](https://github.com/snigdho48/llm-cli/releases)
+1. Download the matching **`llm-cli-*-win-x64.zip`** (or `win-x86` / `win-arm64`) from [Releases](https://github.com/snigdho48/llm-cli/releases)
 2. Extract, then:
 
 ```powershell

@@ -13,16 +13,34 @@
     .\scripts\install.ps1
 #>
 param(
-    [string]$Configuration = "Release"
+    [string]$Configuration = "Release",
+    [string]$Runtime = ""
 )
 
 $ErrorActionPreference = "Stop"
+
+function Get-HostRid {
+    try {
+        $arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+    }
+    catch {
+        $arch = if ([Environment]::Is64BitOperatingSystem) { "X64" } else { "X86" }
+    }
+
+    switch ($arch) {
+        "X64" { return "win-x64" }
+        "X86" { return "win-x86" }
+        "Arm64" { return "win-arm64" }
+        default { return "win-x64" }
+    }
+}
 
 $scriptDir = $PSScriptRoot
 $repoRoot = Split-Path -Parent $scriptDir
 $cliProject = Join-Path $repoRoot "src\LLM.CLI\LLM.CLI.csproj"
 $installRoot = Join-Path $env:LOCALAPPDATA "LLM\cli"
 $shimDirectory = Join-Path $env:LOCALAPPDATA "LLM\bin"
+$rid = if ([string]::IsNullOrWhiteSpace($Runtime)) { Get-HostRid } else { $Runtime }
 
 New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
 New-Item -ItemType Directory -Force -Path $shimDirectory | Out-Null
@@ -42,7 +60,7 @@ elseif (Test-Path $legacyExe) {
     Copy-Item $legacyExe (Join-Path $installRoot "llm.exe") -Force
 }
 elseif (Test-Path $cliProject) {
-    Write-Host "Building self-contained llm.exe ($Configuration)..." -ForegroundColor Cyan
+    Write-Host "Building self-contained llm.exe for $rid ($Configuration)..." -ForegroundColor Cyan
     Push-Location $repoRoot
     try {
         if (Test-Path $installRoot) {
@@ -52,7 +70,7 @@ elseif (Test-Path $cliProject) {
 
         dotnet publish $cliProject `
             -c $Configuration `
-            -r win-x64 `
+            -r $rid `
             -o $installRoot `
             --self-contained true `
             /p:PublishSingleFile=true `
