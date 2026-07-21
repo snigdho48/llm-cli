@@ -66,7 +66,7 @@ try {
 
         $requiredDocs = @(
             "docs\ARCHITECTURE.md", "docs\SPEC.md", "docs\COMMANDS.md",
-            "docs\PRODUCTION_PLAN.md", "docs\ROADMAP.md"
+            "docs\MODELS.md", "docs\CONFIGURATION.md", "docs\RELEASE.md"
         )
         $docsOk = ($requiredDocs | ForEach-Object { Test-Path (Join-Path $repoRoot $_) }) -notcontains $false
         Add-Result "CAP-DOCS" $docsOk "required docs present"

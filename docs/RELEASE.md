@@ -8,9 +8,8 @@
 ```
 
 Outputs (gitignored under `artifacts/release/`):
-- `llm-cli-1.0.0-win-x64.zip`
-- `llm-cli-1.0.0-win-x64.zip.sha256`
-- Updates `packaging/winget/manifest/*.yaml` PackageVersion + InstallerSha256
+- `llm-1.0.0-win-*.exe` / `llm-cli-1.0.0-win-*.zip` (no `.sha256` sidecar files)
+- Updates `packaging/winget/manifest/*.yaml` PackageVersion + InstallerSha256 (winget only)
 
 ## GitHub Actions (recommended)
 
@@ -32,8 +31,8 @@ Or: **Actions → Release → Run workflow** and enter version `1.0.0`.
 
 The Release workflow will:
 1. Run harness + `scripts/release.ps1`
-2. Upload zip + sha256 as Actions artifacts
-3. Create a GitHub Release with the zip, checksum, and winget YAML attached
+2. Upload exe + zip as Actions artifacts
+3. Create a GitHub Release with exe/zip and winget YAML (no `.sha256` assets)
 
 ## Human verification
 

@@ -61,9 +61,7 @@ jobs:
           name: llm-cli-${{ steps.ver.outputs.version }}-windows
           path: |
             artifacts/release/llm-*.exe
-            artifacts/release/llm-*.exe.sha256
             artifacts/release/llm-cli-*.zip
-            artifacts/release/llm-cli-*.zip.sha256
             packaging/winget/manifest/
           if-no-files-found: error
 
@@ -104,17 +102,11 @@ jobs:
             Multi-arch manifests for `Snigdho48.LLMCLI` are attached.
           files: |
             artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x64.exe
-            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x64.exe.sha256
             artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x86.exe
-            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-x86.exe.sha256
             artifacts/release/llm-${{ steps.ver.outputs.version }}-win-arm64.exe
-            artifacts/release/llm-${{ steps.ver.outputs.version }}-win-arm64.exe.sha256
             artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip
-            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip.sha256
             artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x86.zip
-            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x86.zip.sha256
             artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-arm64.zip
-            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-arm64.zip.sha256
             packaging/winget/manifest/Snigdho48.LLMCLI.yaml
             packaging/winget/manifest/Snigdho48.LLMCLI.locale.en-US.yaml
             packaging/winget/manifest/Snigdho48.LLMCLI.installer.yaml

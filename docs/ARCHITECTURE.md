@@ -158,4 +158,4 @@ llm cursor
 - Plugin-friendly workspace layout
 - Production-ready error messages and doctor checks
 
-See also: `SPEC.md`, `COMMANDS.md`, `ROADMAP.md`.
+See also: `SPEC.md`, `COMMANDS.md`, `MODELS.md`, `RELEASE.md`.

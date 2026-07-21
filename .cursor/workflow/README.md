@@ -74,7 +74,7 @@ dotnet run --project src/LLM.CLI -- doctor
 - [x] v1.7 — Model search + pull (Hugging Face catalog)
 - [x] v1.8 — `llm serve`
 
-See `docs/ROADMAP.md` for v1.9+ (runtime install from GitHub, winget, plugins).
+Shipped features through v1.0+ are covered in the root `README.md` and `docs/`.
 
 ## Agent rules
 

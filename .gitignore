@@ -1,6 +1,36 @@
+## Build
 bin/
 obj/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+project.lock.json
+*.nupkg
+TestResults/
+publish/
+
+## IDE / OS
 .vs/
+.vscode/
+.idea/
+*.swp
+*~
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## Local runtime / packages
+artifacts/
 logs/
 *.log
-artifacts/
+*.sha256
+
+## Internal planning & research (not for the public repo)
+docs/NEXT_STEPS_RESEARCH.md
+docs/PRODUCTION_PLAN.md
+docs/ROADMAP.md
+docs/ARCHITECTURE_NEXT.md
+docs/*_RESEARCH.md
+**/README_ALPHA*.md

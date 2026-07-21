@@ -21,7 +21,7 @@ Eval-driven development (EDD) for production readiness. Run before and after eve
 |------|----------|---------|
 | Capability | `evals/capability/` | New feature pass/fail criteria |
 | Regression | `evals/baseline.json` | Must-not-break checklist |
-| Human | `docs/PRODUCTION_PLAN.md` Phase 7 | Manual Cursor + inference check |
+| Human | Manual | Cursor + inference check before a release |
 
 ## Metrics
 
@@ -33,4 +33,4 @@ Eval-driven development (EDD) for production readiness. Run before and after eve
 1. Create `evals/capability/<feature>.md` with success criteria
 2. Add check to `scripts/harness.ps1` if automatable
 3. Update `evals/baseline.json` regression list
-4. Mark phase complete in `docs/PRODUCTION_PLAN.md`
+4. Run `.\scripts\harness.ps1` before release sign-off

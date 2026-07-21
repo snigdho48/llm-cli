@@ -4,6 +4,48 @@ All notable changes to LLM CLI are documented here.
 
 ## [Unreleased]
 
+### Removed — 2026-07-21
+
+**Time:** 2026-07-21 17:12 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** Drop internal planning/research docs from the repo; expand `.gitignore` for build junk and those paths.
+
+**Files:**
+- `.gitignore` — artifacts, logs, IDE, research doc patterns
+- `docs/NEXT_STEPS_RESEARCH.md`, `PRODUCTION_PLAN.md`, `ROADMAP.md` — removed from git
+- `src/LLM.CLI/Routing/README_ALPHA04.md` — removed
+- `scripts/harness.ps1`, evals/docs references — updated
+
+**Impact:** Public repo keeps product docs only.
+
+### Changed — 2026-07-21
+
+**Time:** 2026-07-21 17:11 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** MODELS.md rewritten for all hardware — recommendations by RAM, CPU cores, and GPU (Iris Xe, Arc, NVIDIA, AMD, CPU).
+
+**Files:**
+- `docs/MODELS.md` — hardware-agnostic model / quant / combo tables
+
+**Impact:** Users pick models from their machine specs, not one laptop profile.
+
+### Changed — 2026-07-21
+
+**Time:** 2026-07-21 17:08 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** GitHub Releases no longer attach `.sha256` sidecar files; hashes remain only inside winget InstallerSha256.
+
+**Files:**
+- `scripts/release.ps1` — stop writing `.sha256` files
+- `.github/workflows/release.yml` — drop checksum assets from release
+- `.github/workflows/ci.yml` — drop checksum artifacts
+- `docs/RELEASE.md`, `packaging/winget/README.md` — docs
+
+**Impact:** Cleaner release downloads (exe + zip only).
+
 ### Changed — 2026-07-21
 
 **Time:** 2026-07-21 17:05 (UTC+6)  

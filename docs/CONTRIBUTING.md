@@ -47,7 +47,7 @@ fix(runtime): wait for health after start
 2. Create service(s) in `src/LLM.CLI/Services/` if needed
 3. Register in `Program.cs`: `services.AddSingleton<ICommand, MyCommand>()`
 4. Add to `HelpCommand.cs`
-5. Document in `docs/COMMANDS.md` and `docs/SPEC.md`
+5. Document in `docs/COMMANDS.md`
 6. Add tests in `tests/LLM.Tests/`
 
 ## Testing

@@ -43,9 +43,7 @@ function Publish-OneRuntime {
     $label = $Rid
     $publishDir = Join-Path $outRoot "llm-cli-$Version-$Rid"
     $zipPath = Join-Path $outRoot "llm-cli-$Version-$Rid.zip"
-    $shaPath = Join-Path $outRoot "llm-cli-$Version-$Rid.zip.sha256"
     $standaloneExe = Join-Path $outRoot "llm-$Version-$Rid.exe"
-    $standaloneSha = Join-Path $outRoot "llm-$Version-$Rid.exe.sha256"
 
     Write-Host ""
     Write-Host "=== Publishing $label ===" -ForegroundColor Cyan
@@ -97,18 +95,16 @@ function Publish-OneRuntime {
     }
 
     Copy-Item $exePath $standaloneExe -Force
-    $exeHash = (Get-FileHash -Path $standaloneExe -Algorithm SHA256).Hash.ToUpperInvariant()
-    Set-Content -Path $standaloneSha -Value "$exeHash  llm-$Version-$Rid.exe" -Encoding ASCII
 
     if (Test-Path $zipPath) {
         Remove-Item $zipPath -Force
     }
 
     Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
+    # Hash kept for winget InstallerSha256 only — no .sha256 files on GitHub Releases
     $zipHash = (Get-FileHash -Path $zipPath -Algorithm SHA256).Hash.ToUpperInvariant()
-    Set-Content -Path $shaPath -Value "$zipHash  llm-cli-$Version-$Rid.zip" -Encoding ASCII
 
-    Write-Host "[ OK ] $Rid exe=$exeHash zip=$zipHash" -ForegroundColor Green
+    Write-Host "[ OK ] $Rid packaged (zip SHA for winget: $zipHash)" -ForegroundColor Green
 
     return [PSCustomObject]@{
         Rid      = $Rid
@@ -116,7 +112,6 @@ function Publish-OneRuntime {
         ZipName  = "llm-cli-$Version-$Rid.zip"
         ExeName  = "llm-$Version-$Rid.exe"
         ZipHash  = $zipHash
-        ExeHash  = $exeHash
         ZipPath  = $zipPath
         ExePath  = $standaloneExe
     }

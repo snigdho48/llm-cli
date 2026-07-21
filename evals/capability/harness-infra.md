@@ -12,7 +12,7 @@ Establish eval harness and verification loop infrastructure.
 - [ ] `evals/` directory exists with baseline.json
 - [ ] `scripts/harness.ps1` runs build + test + smoke
 - [ ] `scripts/loop-verify.ps1` supports interval verification
-- [ ] `docs/PRODUCTION_PLAN.md` documents all phases
+- [ ] Core docs exist (`ARCHITECTURE`, `COMMANDS`, `MODELS`, `RELEASE`)
 
 ## Grader
 

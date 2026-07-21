@@ -18,7 +18,7 @@ YAML lives in `manifest/` (keep README out of that folder — `winget validate` 
 .\scripts\release.ps1 -Version 1.0.0
 ```
 
-This publishes `artifacts/release/llm-cli-<ver>-win-{x64,x86,arm64}.zip`, matching `.exe` files, checksums, and updates InstallerSha256 for all architectures.
+This publishes `artifacts/release/llm-cli-<ver>-win-{x64,x86,arm64}.zip` and matching `.exe` files, and fills `InstallerSha256` in the winget YAML (no `.sha256` files on the GitHub Release).
 
 ## Local validate / test
 
