@@ -2,28 +2,25 @@ namespace LLM.CLI.Commands;
 
 public sealed class CommandDispatcher
 {
-    private readonly IEnumerable<ICommand> _commands;
+    private readonly Dictionary<string, ICommand> _commands;
 
     public CommandDispatcher(IEnumerable<ICommand> commands)
     {
-        _commands = commands;
+        _commands = commands.ToDictionary(
+            c => c.Name,
+            StringComparer.OrdinalIgnoreCase);
     }
 
     public async Task ExecuteAsync(string[] args)
     {
-        var command = args.Length > 0 ? args[0] : "help";
+        var commandName = args.Length > 0 ? args[0] : "help";
 
-        var handler = _commands
-            .FirstOrDefault(x =>
-                x.Name.Equals(command,
-                    StringComparison.OrdinalIgnoreCase));
-
-        if (handler == null)
+        if (!_commands.TryGetValue(commandName, out var command))
         {
-            Console.WriteLine($"Unknown command: {command}");
+            Console.WriteLine($"Unknown command: {commandName}");
             return;
         }
 
-        await handler.ExecuteAsync(args);
+        await command.ExecuteAsync(args.Skip(1).ToArray());
     }
 }
