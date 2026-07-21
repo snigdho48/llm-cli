@@ -4,6 +4,20 @@ All notable changes to LLM CLI are documented here.
 
 ## [Unreleased]
 
+### Changed — 2026-07-21
+
+**Time:** 2026-07-21 17:14 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** Bump to v1.0.3 so GitHub Release ships without `.sha256` sidecar assets.
+
+**Files:**
+- `src/LLM.CLI/LLM.CLI.csproj` — 1.0.3
+- `scripts/release.ps1` — default version
+- winget manifest PackageVersion
+
+**Impact:** New tag produces exe/zip-only release assets.
+
 ### Removed — 2026-07-21
 
 **Time:** 2026-07-21 17:12 (UTC+6)  

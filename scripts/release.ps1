@@ -9,7 +9,7 @@
     .\scripts\release.ps1 -SkipHarness -Runtimes win-x64,win-arm64
 #>
 param(
-    [string]$Version = "1.0.2",
+    [string]$Version = "1.0.3",
     [string]$Configuration = "Release",
     [string[]]$Runtimes = @("win-x64", "win-x86", "win-arm64"),
     [switch]$SkipHarness
