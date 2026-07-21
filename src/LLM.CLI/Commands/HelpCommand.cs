@@ -11,7 +11,7 @@ public sealed class HelpCommand : ICommand
         Console.WriteLine("version");
         Console.WriteLine("help");
         Console.WriteLine("doctor");
-        Console.WriteLine("runtime");
+	Console.WriteLine("runtime status");
         Console.WriteLine("model");
         Console.WriteLine("profile");
 

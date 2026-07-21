@@ -25,6 +25,7 @@ internal static class Program
 
 			services.AddSingleton<ICommand, VersionCommand>();
 			services.AddSingleton<ICommand, HelpCommand>();
+			services.AddSingleton<ICommand, RuntimeCommand>();
 			services.AddSingleton<ICommand, DoctorCommand>();
                 })
                 .Build();
