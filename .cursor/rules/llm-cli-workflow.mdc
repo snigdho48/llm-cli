@@ -1,0 +1,71 @@
+---
+description: LLM CLI project workflow — build, test, config paths, and runtime conventions
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# LLM CLI workflow
+
+## Project
+
+Cross-platform local AI runtime manager (.NET 8). Windows-first; targets llama.cpp with Vulkan (Intel Iris Xe).
+
+## Before finishing any coding turn
+
+Update `.cursor/workflow/CHANGELOG.md` under `[Unreleased]` (newest first).
+
+Run `.\scripts\harness.ps1` before marking a phase complete.
+
+## Build & test (required)
+
+```powershell
+dotnet build LLM.sln
+dotnet test
+```
+
+Every change must compile with 0 errors. Prefer 0 warnings.
+
+## Architecture rules
+
+- **LLM.CLI** — commands, services, configuration; no business logic in `Program.cs` beyond DI wiring.
+- **LLM.Core** — routing foundation only; no Microsoft.Extensions dependency in Core.
+- **User config** — `%LOCALAPPDATA%\LLM\config.json` (settings only).
+- **Workspace** — user-chosen root (e.g. `D:\AI`) holds runtimes, models, logs.
+- **Managed runtime** — `<workspace>\runtimes\llama.cpp\current\` (copied via `runtime import`, never symlink to source build).
+
+## Command conventions
+
+- Flat dispatcher today: `llm runtime status` passes `["runtime", "status"]` to nested handlers.
+- New commands: implement `ICommand`, register in `Program.cs`, update `HelpCommand`.
+- Config keys use `Runtime:Model`, `Runtime:Port`, `Runtime:GpuLayers` (case-insensitive in handler).
+
+## Runtime defaults (Snigdho hardware)
+
+| Setting | Value |
+|---------|-------|
+| GpuLayers | 29 |
+| ContextSize | 16384 |
+| Threads | 8 |
+| Port | 8080 |
+| Backend | Vulkan via ggml-vulkan.dll |
+
+## Do not
+
+- Hardcode `C:\llama.cpp` or `D:\MODEL` in source — use config.
+- Modify appsettings.json at runtime — use user config.
+- Add duplicate `ICommand` interfaces (CLI uses `LLM.CLI.Commands.ICommand` until router migration).
+
+## Commit message style
+
+```
+feat(runtime): import local llama.cpp build into workspace
+fix(config): normalize root directory on load
+docs(workflow): add Cursor development guide
+```
+
+## Next priorities
+
+1. Hugging Face model catalog (`model search`, `model pull`)
+2. Auto runtime management (`llm serve`, restart on profile change)
+3. Migrate to `LLM.Core.Routing.CommandRouter` when command count grows

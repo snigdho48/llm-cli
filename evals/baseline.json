@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-07-21",
+  "regressionEvals": [
+    { "id": "REG-BUILD", "check": "dotnet build LLM.sln", "expect": "0 errors" },
+    { "id": "REG-TEST", "check": "dotnet test LLM.sln", "expect": "all pass" },
+    { "id": "REG-SMOKE-HELP", "check": "llm help", "expect": "exit 0" },
+    { "id": "REG-SMOKE-VERSION", "check": "llm version", "expect": "exit 0, shows version" },
+    { "id": "REG-SMOKE-SEARCH", "check": "llm model search coder", "expect": "exit 0, shows qwen" }
+  ],
+  "releaseGate": {
+    "passConsecutive": 3,
+    "script": "scripts/harness.ps1"
+  }
+}

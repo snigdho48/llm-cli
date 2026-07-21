@@ -11,16 +11,16 @@ public sealed class CommandDispatcher
             StringComparer.OrdinalIgnoreCase);
     }
 
-    public async Task ExecuteAsync(string[] args)
+    public async Task<int> ExecuteAsync(string[] args)
     {
         var commandName = args.Length > 0 ? args[0] : "help";
 
         if (!_commands.TryGetValue(commandName, out var command))
         {
             Console.WriteLine($"Unknown command: {commandName}");
-            return;
+            return CommandResults.Failure;
         }
 
-        await command.ExecuteAsync(args.Skip(1).ToArray());
+        return await command.ExecuteAsync(args.Skip(1).ToArray());
     }
 }

@@ -3,3 +3,4 @@ obj/
 .vs/
 logs/
 *.log
+artifacts/

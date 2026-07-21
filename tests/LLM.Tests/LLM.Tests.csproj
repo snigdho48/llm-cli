@@ -9,5 +9,6 @@
 </ItemGroup>
 <ItemGroup>
   <ProjectReference Include="..\..\src\LLM.Core\LLM.Core.csproj" />
+  <ProjectReference Include="..\..\src\LLM.CLI\LLM.CLI.csproj" />
 </ItemGroup>
 </Project>

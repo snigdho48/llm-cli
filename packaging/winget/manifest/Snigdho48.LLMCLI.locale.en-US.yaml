@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
+PackageIdentifier: Snigdho48.LLMCLI
+PackageVersion: 1.0.0
+PackageLocale: en-US
+Publisher: Snigdho48
+PublisherUrl: https://github.com/snigdho48
+PublisherSupportUrl: https://github.com/snigdho48/llm-cli/issues
+Author: Snigdho48
+PackageName: LLM CLI
+PackageUrl: https://github.com/snigdho48/llm-cli
+License: MIT
+LicenseUrl: https://github.com/snigdho48/llm-cli/blob/main/LICENSE
+Copyright: Copyright (c) Snigdho48
+ShortDescription: Local AI runtime manager for Windows (llama.cpp, models, Cursor OpenAI API)
+Description: LLM CLI manages a local llama.cpp runtime, model downloads, hardware profiles, and an OpenAI-compatible API for tools like Cursor. Windows-first with Vulkan support for Intel Iris Xe, NVIDIA CUDA, and AMD ROCm backends.
+Moniker: llm-cli
+Tags:
+  - ai
+  - cli
+  - cursor
+  - llama
+  - llama.cpp
+  - llm
+  - local-ai
+  - openai
+  - vulkan
+ReleaseNotesUrl: https://github.com/snigdho48/llm-cli/releases/tag/v1.0.0
+ManifestType: defaultLocale
+ManifestVersion: 1.9.0

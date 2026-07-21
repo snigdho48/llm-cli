@@ -1,0 +1,116 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without v prefix (e.g. 1.0.0)"
+        required: true
+        default: "1.0.0"
+      prerelease:
+        description: "Mark GitHub Release as prerelease"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Resolve version
+        id: ver
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $version = "${{ inputs.version }}".Trim().TrimStart('v')
+          }
+          else {
+            $tag = "${{ github.ref_name }}"
+            if ($tag -notmatch '^v?\d+\.\d+\.\d+') {
+              throw "Tag must look like v1.0.0 (got: $tag)"
+            }
+            $version = $tag.TrimStart('v')
+          }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "tag=v$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "Resolved version=$version tag=v$version"
+
+      - name: Build + package
+        shell: pwsh
+        run: ./scripts/release.ps1 -Version "${{ steps.ver.outputs.version }}"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-cli-${{ steps.ver.outputs.version }}-win-x64
+          path: |
+            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip
+            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip.sha256
+            packaging/winget/manifest/
+          if-no-files-found: error
+
+      - name: Read SHA256
+        id: sha
+        shell: pwsh
+        run: |
+          $shaFile = "artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip.sha256"
+          $line = Get-Content $shaFile -Raw
+          $hash = ($line -split '\s+')[0].Trim()
+          "sha256=$hash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: LLM CLI ${{ steps.ver.outputs.tag }}
+          draft: false
+          prerelease: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease }}
+          generate_release_notes: true
+          body: |
+            ## LLM CLI ${{ steps.ver.outputs.tag }}
+
+            Windows x64 package (requires [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)).
+
+            ### Install
+
+            ```powershell
+            # Extract zip, then:
+            .\install.ps1
+            llm --help
+            ```
+
+            Or use the portable `LLM.CLI.exe` via the `llm` shim created by `install.ps1`.
+
+            ### Checksums
+
+            - `llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip`
+            - SHA256: `${{ steps.sha.outputs.sha256 }}`
+
+            ### Winget
+
+            Manifests for `Snigdho48.LLMCLI` are attached / in `packaging/winget/manifest`.
+            Submit to [winget-pkgs](https://github.com/microsoft/winget-pkgs) after this release is public.
+          files: |
+            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip
+            artifacts/release/llm-cli-${{ steps.ver.outputs.version }}-win-x64.zip.sha256
+            packaging/winget/manifest/Snigdho48.LLMCLI.yaml
+            packaging/winget/manifest/Snigdho48.LLMCLI.locale.en-US.yaml
+            packaging/winget/manifest/Snigdho48.LLMCLI.installer.yaml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

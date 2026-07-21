@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test-harness:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore LLM.sln
+
+      - name: Build
+        run: dotnet build LLM.sln --no-restore -c Release
+
+      - name: Test
+        run: dotnet test LLM.sln --no-build -c Release --verbosity normal
+
+      - name: Harness
+        shell: pwsh
+        run: ./scripts/harness.ps1 -SkipSmoke
+
+  package:
+    needs: build-test-harness
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Package (CI preview)
+        shell: pwsh
+        run: |
+          $ver = "0.0.0-ci.${{ github.run_number }}"
+          ./scripts/release.ps1 -Version $ver -SkipHarness
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-cli-win-x64-ci
+          path: |
+            artifacts/release/*.zip
+            artifacts/release/*.sha256
+          if-no-files-found: error
+          retention-days: 14
