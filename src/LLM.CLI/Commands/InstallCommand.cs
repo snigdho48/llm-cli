@@ -1,4 +1,4 @@
-using System.Reflection;
+using System.IO;
 
 namespace LLM.CLI.Commands;
 
@@ -105,10 +105,17 @@ public sealed class InstallCommand : ICommand
             return processPath;
         }
 
-        var location = Assembly.GetExecutingAssembly().Location;
-        if (!string.IsNullOrWhiteSpace(location) && File.Exists(location))
+        // Avoid Assembly.Location — empty / IL3000 under PublishSingleFile.
+        var candidate = Path.Combine(AppContext.BaseDirectory, "llm.exe");
+        if (File.Exists(candidate))
         {
-            return location;
+            return candidate;
+        }
+
+        candidate = Path.Combine(AppContext.BaseDirectory, "LLM.CLI.exe");
+        if (File.Exists(candidate))
+        {
+            return candidate;
         }
 
         return null;

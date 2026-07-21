@@ -67,7 +67,7 @@ function Publish-OneRuntime {
         /p:DebugSymbols=false
 
     if ($LASTEXITCODE -ne 0) {
-        throw "dotnet publish failed for $Rid"
+        throw "dotnet publish failed for $Rid (see output above)"
     }
 
     $publishedExe = Join-Path $publishDir "LLM.CLI.exe"

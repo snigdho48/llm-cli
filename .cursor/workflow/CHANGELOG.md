@@ -4,6 +4,18 @@ All notable changes to LLM CLI are documented here.
 
 ## [Unreleased]
 
+### Fixed — 2026-07-21
+
+**Time:** 2026-07-21 17:30 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** Fix single-file publish IL3000 from `Assembly.Location` in `InstallCommand` (broke release win-x64 publish).
+
+**Files:**
+- `src/LLM.CLI/Commands/InstallCommand.cs` — use ProcessPath / AppContext.BaseDirectory
+
+**Impact:** `scripts/release.ps1` / GitHub Release workflow can publish again.
+
 ### Added — 2026-07-21
 
 **Time:** 2026-07-21 17:22 (UTC+6)  
