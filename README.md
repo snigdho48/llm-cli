@@ -330,7 +330,13 @@ llm help
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+**MIT License** — free and open source.
+
+Copyright (c) 2026 **MD. Atiquzzaman Snigdho**
+
+You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of this software, subject to including the copyright and permission
+notice. Full text: [LICENSE](LICENSE).
 
 **Repo:** https://github.com/snigdho48/llm-cli  
 **Releases:** https://github.com/snigdho48/llm-cli/releases

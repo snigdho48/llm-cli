@@ -5,5 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>latest</LangVersion>
+    <Authors>MD. Atiquzzaman Snigdho</Authors>
+    <Company>MD. Atiquzzaman Snigdho</Company>
+    <Copyright>Copyright (c) 2026 MD. Atiquzzaman Snigdho</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/snigdho48/llm-cli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/snigdho48/llm-cli</RepositoryUrl>
   </PropertyGroup>
 </Project>

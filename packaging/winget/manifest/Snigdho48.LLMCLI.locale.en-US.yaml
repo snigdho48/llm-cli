@@ -5,12 +5,12 @@ PackageLocale: en-US
 Publisher: Snigdho48
 PublisherUrl: https://github.com/snigdho48
 PublisherSupportUrl: https://github.com/snigdho48/llm-cli/issues
-Author: Snigdho48
+Author: MD. Atiquzzaman Snigdho
 PackageName: LLM CLI
 PackageUrl: https://github.com/snigdho48/llm-cli
 License: MIT
 LicenseUrl: https://github.com/snigdho48/llm-cli/blob/main/LICENSE
-Copyright: Copyright (c) Snigdho48
+Copyright: Copyright (c) 2026 MD. Atiquzzaman Snigdho
 ShortDescription: Local AI runtime manager for Windows (llama.cpp, models, Cursor OpenAI API)
 Description: LLM CLI manages a local llama.cpp runtime, model downloads, hardware profiles, and an OpenAI-compatible API for tools like Cursor. Windows-first with Vulkan support for Intel Iris Xe, NVIDIA CUDA, and AMD ROCm backends.
 Moniker: llm-cli

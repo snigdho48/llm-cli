@@ -6,6 +6,21 @@ All notable changes to LLM CLI are documented here.
 
 ### Changed — 2026-07-21
 
+**Time:** 2026-07-21 17:05 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** MIT license copyright set to MD. Atiquzzaman Snigdho; README and winget locale updated for free/open-source attribution.
+
+**Files:**
+- `LICENSE` — copyright holder name
+- `README.md` — license section
+- `packaging/winget/manifest/Snigdho48.LLMCLI.locale.en-US.yaml` — Author / Copyright
+- `Directory.Build.props` — PackageLicenseExpression / Authors
+
+**Impact:** Clear MIT ownership for GitHub, releases, and winget.
+
+### Changed — 2026-07-21
+
 **Time:** 2026-07-21 17:20 (UTC+6)  
 **Author:** Cursor agent
 
