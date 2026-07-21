@@ -1,11 +1,11 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Build release artifacts for LLM CLI and refresh winget installer SHA256.
+    Build self-contained single-file llm.exe + zip for Windows x64.
 
 .EXAMPLE
     .\scripts\release.ps1
-    .\scripts\release.ps1 -Version 1.0.0
+    .\scripts\release.ps1 -Version 1.0.1
     .\scripts\release.ps1 -SkipHarness
 #>
 param(
@@ -21,9 +21,11 @@ $outRoot = Join-Path $repoRoot "artifacts\release"
 $publishDir = Join-Path $outRoot "llm-cli-$Version-win-x64"
 $zipPath = Join-Path $outRoot "llm-cli-$Version-win-x64.zip"
 $shaPath = Join-Path $outRoot "llm-cli-$Version-win-x64.zip.sha256"
+$standaloneExe = Join-Path $outRoot "llm-$Version-win-x64.exe"
+$standaloneSha = Join-Path $outRoot "llm-$Version-win-x64.exe.sha256"
 $wingetInstaller = Join-Path $repoRoot "packaging\winget\manifest\Snigdho48.LLMCLI.installer.yaml"
 
-Write-Host "Release build v$Version" -ForegroundColor Cyan
+Write-Host "Release build v$Version (self-contained single-file)" -ForegroundColor Cyan
 
 Push-Location $repoRoot
 try {
@@ -43,16 +45,39 @@ try {
 
     New-Item -ItemType Directory -Force -Path $outRoot | Out-Null
 
+    # Self-contained single-file: users get llm.exe with no separate .NET install.
     dotnet publish $cliProject `
         -c $Configuration `
+        -r win-x64 `
         -o $publishDir `
+        --self-contained true `
         /p:Version=$Version `
-        --self-contained false
+        /p:PublishSingleFile=true `
+        /p:IncludeNativeLibrariesForSelfExtract=true `
+        /p:EnableCompressionInSingleFile=true `
+        /p:DebugType=None `
+        /p:DebugSymbols=false
 
-    $exePath = Join-Path $publishDir "LLM.CLI.exe"
-    if (-not (Test-Path $exePath)) {
+    $publishedExe = Join-Path $publishDir "LLM.CLI.exe"
+    $exePath = Join-Path $publishDir "llm.exe"
+    if (-not (Test-Path $publishedExe)) {
         throw "Publish failed - LLM.CLI.exe missing in $publishDir"
     }
+
+    Move-Item $publishedExe $exePath -Force
+    # Drop leftover framework noise if any (single-file should be one main exe + optional pdbs already disabled)
+    Get-ChildItem $publishDir -File |
+        Where-Object { $_.Name -notin @('llm.exe', 'install.ps1', 'uninstall.ps1', 'README.md', 'LICENSE') -and $_.Extension -in '.dll', '.pdb', '.json' } |
+        Remove-Item -Force -ErrorAction SilentlyContinue
+
+    if (-not (Test-Path $exePath)) {
+        throw "Publish failed - llm.exe missing in $publishDir"
+    }
+
+    # Standalone exe copy for direct download from GitHub Releases.
+    Copy-Item $exePath $standaloneExe -Force
+    $exeHash = (Get-FileHash -Path $standaloneExe -Algorithm SHA256).Hash.ToUpperInvariant()
+    Set-Content -Path $standaloneSha -Value "$exeHash  llm-$Version-win-x64.exe" -Encoding ASCII
 
     Copy-Item (Join-Path $repoRoot "scripts\install.ps1") $publishDir -Force
     Copy-Item (Join-Path $repoRoot "scripts\uninstall.ps1") $publishDir -Force
@@ -90,6 +115,11 @@ try {
             $content,
             '/download/v[0-9]+\.[0-9]+\.[0-9]+/',
             ("/download/v$Version/"))
+        # Prefer llm.exe nested portable entry
+        $content = [regex]::Replace(
+            $content,
+            '(?m)^(\s*RelativeFilePath:\s*).+$',
+            '${1}llm.exe')
         Set-Content -Path $wingetInstaller -Value $content.TrimEnd() -Encoding ascii
         Write-Host "[ OK ] Updated winget InstallerSha256" -ForegroundColor Green
     }
@@ -114,15 +144,15 @@ try {
 
     Write-Host ""
     Write-Host "[ OK ] Release artifacts:" -ForegroundColor Green
-    Write-Host "  $publishDir"
+    Write-Host "  $exePath"
+    Write-Host "  $standaloneExe"
     Write-Host "  $zipPath"
-    Write-Host "  $shaPath"
-    Write-Host "  SHA256: $hash"
+    Write-Host "  EXE SHA256: $exeHash"
+    Write-Host "  ZIP SHA256: $hash"
     Write-Host ""
     Write-Host "Next:"
-    Write-Host "  1. Create GitHub Release v$Version and upload the zip"
+    Write-Host "  1. Upload llm-$Version-win-x64.exe and the zip to GitHub Release"
     Write-Host "  2. Validate: winget validate --manifest packaging\winget\manifest"
-    Write-Host "  3. PR to microsoft/winget-pkgs (see packaging\winget\README.md)"
 }
 finally {
     Pop-Location

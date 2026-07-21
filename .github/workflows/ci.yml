@@ -57,6 +57,7 @@ jobs:
           name: llm-cli-win-x64-ci
           path: |
             artifacts/release/*.zip
+            artifacts/release/*.exe
             artifacts/release/*.sha256
           if-no-files-found: error
           retention-days: 14

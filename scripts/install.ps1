@@ -1,13 +1,15 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Builds and installs the LLM CLI as a global `llm` command on Windows.
+    Installs LLM CLI as a global `llm` command on Windows.
 
 .DESCRIPTION
-    Publishes LLM.CLI to %LOCALAPPDATA%\LLM\cli and adds a shim directory
-    to the current user's PATH. Run from the repository root.
+    Prefer a prebuilt llm.exe next to this script (release zip).
+    Otherwise publishes from the repo source into %LOCALAPPDATA%\LLM\cli
+    and adds a shim on PATH.
 
 .EXAMPLE
+    .\install.ps1
     .\scripts\install.ps1
 #>
 param(
@@ -16,32 +18,72 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$scriptDir = $PSScriptRoot
+$repoRoot = Split-Path -Parent $scriptDir
 $cliProject = Join-Path $repoRoot "src\LLM.CLI\LLM.CLI.csproj"
 $installRoot = Join-Path $env:LOCALAPPDATA "LLM\cli"
 $shimDirectory = Join-Path $env:LOCALAPPDATA "LLM\bin"
 
-Write-Host "Building LLM CLI ($Configuration)..." -ForegroundColor Cyan
-Push-Location $repoRoot
-try {
-    dotnet publish $cliProject `
-        -c $Configuration `
-        -o $installRoot `
-        --self-contained false `
-        /p:PublishSingleFile=false
+New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $shimDirectory | Out-Null
+
+$bundledExe = Join-Path $scriptDir "llm.exe"
+$legacyExe = Join-Path $scriptDir "LLM.CLI.exe"
+
+if (Test-Path $bundledExe) {
+    Write-Host "Installing bundled llm.exe..." -ForegroundColor Cyan
+    Copy-Item $bundledExe (Join-Path $installRoot "llm.exe") -Force
+    # Keep compatibility name for older shims.
+    Copy-Item $bundledExe (Join-Path $installRoot "LLM.CLI.exe") -Force
 }
-finally {
-    Pop-Location
+elseif (Test-Path $legacyExe) {
+    Write-Host "Installing bundled LLM.CLI.exe..." -ForegroundColor Cyan
+    Copy-Item $legacyExe (Join-Path $installRoot "LLM.CLI.exe") -Force
+    Copy-Item $legacyExe (Join-Path $installRoot "llm.exe") -Force
+}
+elseif (Test-Path $cliProject) {
+    Write-Host "Building self-contained llm.exe ($Configuration)..." -ForegroundColor Cyan
+    Push-Location $repoRoot
+    try {
+        if (Test-Path $installRoot) {
+            Get-ChildItem $installRoot -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
+
+        dotnet publish $cliProject `
+            -c $Configuration `
+            -r win-x64 `
+            -o $installRoot `
+            --self-contained true `
+            /p:PublishSingleFile=true `
+            /p:IncludeNativeLibrariesForSelfExtract=true `
+            /p:EnableCompressionInSingleFile=true `
+            /p:DebugType=None `
+            /p:DebugSymbols=false
+    }
+    finally {
+        Pop-Location
+    }
+
+    $built = Join-Path $installRoot "LLM.CLI.exe"
+    if (-not (Test-Path $built)) {
+        throw "Publish failed - LLM.CLI.exe not found in $installRoot"
+    }
+
+    Copy-Item $built (Join-Path $installRoot "llm.exe") -Force
+}
+else {
+    throw "No llm.exe found next to install.ps1 and no source project to build."
 }
 
-New-Item -ItemType Directory -Force -Path $shimDirectory | Out-Null
+$exeName = if (Test-Path (Join-Path $installRoot "llm.exe")) { "llm.exe" } else { "LLM.CLI.exe" }
 
 $shimPath = Join-Path $shimDirectory "llm.cmd"
 $shimContent = @"
 @echo off
 setlocal
 set "LLM_CLI_HOME=$installRoot"
-"%LLM_CLI_HOME%\LLM.CLI.exe" %*
+"%LLM_CLI_HOME%\$exeName" %*
 "@
 
 Set-Content -Path $shimPath -Value $shimContent -Encoding ASCII
@@ -65,12 +107,11 @@ else {
 
 Write-Host ""
 Write-Host "Installed successfully." -ForegroundColor Green
-Write-Host "  CLI binaries : $installRoot"
+Write-Host "  CLI binary    : $(Join-Path $installRoot $exeName)"
 Write-Host "  Global command: llm"
 Write-Host ""
 Write-Host "Open a new terminal, then run:"
 Write-Host "  llm init `"D:\AI`" --auto"
-Write-Host "  llm setup --workspace `"D:\AI`" --install-runtime --model `"D:\MODEL\your-model.gguf`" --no-start"
-Write-Host "  # or: llm runtime install"
+Write-Host "  llm setup --workspace `"D:\AI`" --install-runtime"
 Write-Host "  llm serve"
 Write-Host "  llm doctor"

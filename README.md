@@ -19,39 +19,52 @@ LLM CLI sets up **llama.cpp**, downloads models, picks your GPU (Intel / NVIDIA 
 ## Requirements
 
 - Windows 10/11 (64-bit)
-- [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (Desktop or Runtime)
 - About **16–32 GB RAM** for a 7B coding model (Q4)
 - Optional: Intel Graphics driver with Vulkan (for Iris Xe)
+
+No separate .NET install is required for the Release **exe** / zip builds (they are self-contained).
 
 ---
 
 ## Install
 
-### Option A — GitHub Release (recommended)
+### Option A — Single EXE (easiest)
 
-1. Download the latest **`llm-cli-*-win-x64.zip`** from  
-   [Releases](https://github.com/snigdho48/llm-cli/releases)
-2. Extract the zip
-3. In PowerShell, from that folder:
+1. Download **`llm-*-win-x64.exe`** from [Releases](https://github.com/snigdho48/llm-cli/releases)
+2. Rename it to `llm.exe` and put it in a folder on your PATH  
+   (or run it by full path)
+
+```powershell
+# Example:
+mkdir $env:LOCALAPPDATA\LLM\bin -Force
+Copy-Item .\llm-1.0.1-win-x64.exe $env:LOCALAPPDATA\LLM\bin\llm.exe
+# Add that folder to your user PATH if needed, then open a new terminal:
+llm version
+```
+
+### Option B — Zip + installer
+
+1. Download **`llm-cli-*-win-x64.zip`** from [Releases](https://github.com/snigdho48/llm-cli/releases)
+2. Extract, then:
 
 ```powershell
 .\install.ps1
 ```
 
-4. Open a **new** terminal, then check:
+3. Open a **new** terminal:
 
 ```powershell
 llm version
 llm help
 ```
 
-### Option B — From this repo
+### Option C — From this repo (developers)
 
 ```powershell
 .\scripts\install.ps1
 ```
 
-To uninstall the global `llm` command later:
+To uninstall the global `llm` shim later:
 
 ```powershell
 .\scripts\uninstall.ps1

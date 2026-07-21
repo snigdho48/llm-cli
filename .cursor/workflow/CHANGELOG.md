@@ -4,6 +4,22 @@ All notable changes to LLM CLI are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-07-21
+
+**Time:** 2026-07-21 17:10 (UTC+6)  
+**Author:** Cursor agent
+
+**Summary:** Release builds a self-contained single-file `llm.exe` (no separate .NET install) plus standalone download and zip.
+
+**Files:**
+- `scripts/release.ps1` — `PublishSingleFile` + `win-x64` self-contained; emits `llm-*-win-x64.exe`
+- `scripts/install.ps1` — prefers bundled `llm.exe`; builds single-file from source
+- `packaging/winget/manifest/*.yaml` — nested `llm.exe`, no DotNet runtime dependency
+- `.github/workflows/release.yml` / `ci.yml` — upload exe + zip
+- `README.md` — single-EXE install instructions
+
+**Impact:** Users can download one `.exe` from GitHub Releases and run without installing .NET.
+
 ### Changed — 2026-07-21
 
 **Time:** 2026-07-21 17:05 (UTC+6)  
